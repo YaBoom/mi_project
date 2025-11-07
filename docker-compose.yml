@@ -1,0 +1,62 @@
+version: '3'
+
+services:
+  # Zookeeper
+  zookeeper:
+    image: zookeeper:3.6.3
+    ports:
+      - "2181:2181"
+    restart: always
+
+  # Redis
+  redis:
+    image: redis:6.2
+    ports:
+      - "6379:6379"
+    restart: always
+    command: redis-server --appendonly yes
+
+  # RabbitMQ
+  rabbitmq:
+    image: rabbitmq:3.8-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    restart: always
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+
+  # Elasticsearch
+  elasticsearch:
+    image: elasticsearch:7.10.1
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    restart: always
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+
+  # MinIO
+  minio:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    restart: always
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=admin123
+    command: server /data --console-address ":9001"
+
+  # Nginx
+  nginx:
+    image: nginx:1.20
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: always
+    volumes:
+      - ./nginx/conf:/etc/nginx/conf.d
+      - ./nginx/html:/usr/share/nginx/html

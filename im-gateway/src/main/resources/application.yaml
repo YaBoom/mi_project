@@ -1,0 +1,67 @@
+server:
+  port: 8088
+
+spring:
+  application:
+    name: im-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: im-user-service
+          uri: lb://im-user-service
+          predicates:
+            - Path=/api/user/**
+          filters:
+            - StripPrefix=1
+        
+        - id: im-message-service
+          uri: lb://im-message-service
+          predicates:
+            - Path=/api/message/**
+          filters:
+            - StripPrefix=1
+            
+        - id: im-file-service
+          uri: lb://im-file-service
+          predicates:
+            - Path=/api/file/**
+          filters:
+            - StripPrefix=1
+            
+        - id: im-group-service
+          uri: lb://im-group-service
+          predicates:
+            - Path=/api/group/**
+          filters:
+            - StripPrefix=1
+            
+        - id: im-search-service
+          uri: lb://im-search-service
+          predicates:
+            - Path=/api/search/**
+          filters:
+            - StripPrefix=1
+            
+        - id: im-netty-websocket
+          uri: lb://im-netty
+          predicates:
+            - Path=/ws/**
+          filters:
+            - StripPrefix=0
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        namespace: public
+
+im-netty:
+  ribbon:
+    NFLoadBalancerRuleClassName: com.mi.im.gateway.loadbalance.NettyLoadBalance
+
+zookeeper:
+  address: localhost:2181
+  session-timeout: 60000
+  connection-timeout: 5000

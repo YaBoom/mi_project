@@ -1,0 +1,10 @@
+com\mi\im\group\service\impl\GroupServiceImpl.class
+com\mi\im\group\config\RedisConfig.class
+com\mi\im\group\service\GroupService.class
+com\mi\im\group\config\RedisConfig$1.class
+com\mi\im\group\entity\Group.class
+com\mi\im\group\mapper\GroupMemberMapper.class
+com\mi\im\group\mapper\GroupMapper.class
+com\mi\im\group\ImGroupServiceApplication.class
+com\mi\im\group\entity\GroupMember.class
+com\mi\im\group\controller\GroupController.class

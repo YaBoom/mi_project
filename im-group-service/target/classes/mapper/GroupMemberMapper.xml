@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mi.im.group.mapper.GroupMemberMapper">
+    
+    <!-- 插入群成员信息 -->
+    <insert id="insert" parameterType="com.mi.im.group.entity.GroupMember" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO group_member (group_id, user_id, nickname, role, join_type, status, join_time, update_time, ext_info)
+        VALUES (#{groupId}, #{userId}, #{nickname}, #{role}, #{joinType}, #{status}, #{joinTime}, #{updateTime}, #{extInfo})
+    </insert>
+    
+    <!-- 根据群组ID和用户ID查询群成员信息 -->
+    <select id="selectByGroupIdAndUserId" resultType="com.mi.im.group.entity.GroupMember">
+        SELECT * FROM group_member WHERE group_id = #{groupId} AND user_id = #{userId}
+    </select>
+    
+    <!-- 根据群组ID查询群成员列表 -->
+    <select id="selectByGroupId" resultType="com.mi.im.group.entity.GroupMember">
+        SELECT * FROM group_member 
+        WHERE group_id = #{groupId} AND status = 0
+        ORDER BY role DESC, join_time ASC
+        LIMIT #{offset}, #{limit}
+    </select>
+    
+    <!-- 统计群组成员数量 -->
+    <select id="countByGroupId" parameterType="java.lang.Long" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM group_member WHERE group_id = #{groupId} AND status = 0
+    </select>
+    
+    <!-- 根据群组ID和用户ID列表查询群成员信息 -->
+    <select id="selectByGroupIdAndUserIds" resultType="com.mi.im.group.entity.GroupMember">
+        SELECT * FROM group_member 
+        WHERE group_id = #{groupId} AND user_id IN
+        <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+        AND status = 0
+    </select>
+    
+    <!-- 更新群成员角色 -->
+    <update id="updateMemberRole">
+        UPDATE group_member SET role = #{role}, update_time = NOW() 
+        WHERE group_id = #{groupId} AND user_id = #{userId}
+    </update>
+    
+    <!-- 更新群成员状态 -->
+    <update id="updateMemberStatus">
+        UPDATE group_member SET status = #{status}, update_time = NOW() 
+        WHERE group_id = #{groupId} AND user_id = #{userId}
+    </update>
+    
+    <!-- 更新群组所有成员状态 -->
+    <update id="updateMemberStatusByGroupId">
+        UPDATE group_member SET status = #{status}, update_time = NOW() 
+        WHERE group_id = #{groupId}
+    </update>
+    
+    <!-- 批量删除群成员 -->
+    <delete id="deleteMembers">
+        DELETE FROM group_member 
+        WHERE group_id = #{groupId} AND user_id IN
+        <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+    </delete>
+    
+    <!-- 查询用户加入的所有群组ID -->
+    <select id="selectGroupIdsByUserId" parameterType="java.lang.Long" resultType="java.lang.Long">
+        SELECT group_id FROM group_member WHERE user_id = #{userId} AND status = 0
+    </select>
+    
+    <!-- 根据用户ID查询群成员信息列表 -->
+    <select id="selectByUserId" parameterType="java.lang.Long" resultType="com.mi.im.group.entity.GroupMember">
+        SELECT * FROM group_member WHERE user_id = #{userId} AND status = 0
+        ORDER BY join_time DESC
+    </select>
+</mapper>

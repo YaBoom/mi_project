@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mi.im.user.mapper.UserMapper">
+    
+    <!-- 表名 -->
+    <sql id="tableName">im_user</sql>
+    
+    <!-- 基础字段 -->
+    <sql id="baseColumns">
+        user_id, username, password, nickname, avatar, 
+        phone, email, online_status, last_online_time, current_node_id, 
+        latitude, longitude, create_time, update_time, current_server, status
+    </sql>
+    
+    <!-- 根据用户ID查询用户 -->
+    <select id="selectById" parameterType="java.lang.Long" resultType="com.mi.im.common.model.User">
+        SELECT <include refid="baseColumns" />
+        FROM <include refid="tableName" />
+        WHERE user_id = #{userId}
+    </select>
+    
+    <!-- 根据手机号查询用户 -->
+    <select id="selectByPhone" parameterType="java.lang.String" resultType="com.mi.im.common.model.User">
+        SELECT <include refid="baseColumns" />
+        FROM <include refid="tableName" />
+        WHERE phone = #{phone}
+    </select>
+    
+    <!-- 更新用户状态 -->
+    <update id="updateStatus">
+        UPDATE <include refid="tableName" />
+        SET status = #{status},
+            update_time = NOW()
+        WHERE user_id = #{userId}
+    </update>
+    <!-- 更新服务器地址 -->
+    <update id="updateServerAddress">
+        UPDATE <include refid="tableName" />
+        SET current_server = #{serverAddress},
+            update_time = NOW()
+        WHERE user_id = #{userId}
+    </update>
+    
+    <!-- 插入用户（虽然接口中没有，但作为基础方法提供） -->
+    <insert id="insert" parameterType="com.mi.im.common.model.User">
+        INSERT INTO <include refid="tableName" />
+        (
+            user_id, username, password, nickname, avatar, 
+            phone, email, online_status, last_online_time, current_node_id, 
+            latitude, longitude, create_time, update_time, current_server, status
+        )
+        VALUES
+        (
+            #{userId}, #{username}, #{password}, #{nickname}, #{avatar}, 
+            #{phone}, #{email}, #{onlineStatus}, #{lastOnlineTime}, #{currentNodeId}, 
+            #{latitude}, #{longitude}, #{createTime}, #{updateTime}, #{currentServer}, #{status}
+        )
+    </insert>
+    <!-- 更新用户信息（虽然接口中没有，但作为基础方法提供） -->
+    <update id="update" parameterType="com.mi.im.common.model.User">
+        UPDATE <include refid="tableName" />
+        SET 
+            username = #{username},
+            nickname = #{nickname},
+            avatar = #{avatar},
+            phone = #{phone},
+            email = #{email},
+            online_status = #{onlineStatus},
+            last_online_time = #{lastOnlineTime},
+            current_node_id = #{currentNodeId},
+            latitude = #{latitude},
+            longitude = #{longitude},
+            update_time = #{updateTime},
+            current_server = #{currentServer},
+            status = #{status}
+        WHERE user_id = #{userId}
+    </update>
+    <!-- 更新在线状态和最后在线时间 -->
+    <update id="updateOnlineStatus">
+        UPDATE <include refid="tableName" />
+        SET online_status = #{onlineStatus},
+            last_online_time = NOW()
+        WHERE user_id = #{userId}
+    </update>
+    <!-- 查询所有用户（分页） -->
+    <select id="selectAll" resultType="com.mi.im.common.model.User">
+        SELECT <include refid="baseColumns" />
+        FROM <include refid="tableName" />
+        ORDER BY create_time DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+    <!-- 统计用户总数 -->
+    <select id="countAll" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM <include refid="tableName" />
+    </select>
+</mapper>

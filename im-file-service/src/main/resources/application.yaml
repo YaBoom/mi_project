@@ -1,0 +1,35 @@
+server:
+  port: 8084
+  tomcat:
+    max-swallow-size: -1
+
+spring:
+  application:
+    name: im-file-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        namespace: public
+        group: DEFAULT_GROUP
+
+# MinIO配置
+minio:
+  url: http://localhost:9000
+  accessKey: minioadmin
+  secretKey: minioadmin
+  bucketName: im-file
+  secure: false
+
+# 文件上传配置
+file:
+  maxSize: 104857600  # 100MB
+  allowedTypes: image/jpeg,image/png,image/gif,image/bmp,image/webp,application/pdf
+
+# 日志配置
+logging:
+  level:
+    root: info
+    com.mi.im.file: debug
+  pattern:
+    console: '%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n'

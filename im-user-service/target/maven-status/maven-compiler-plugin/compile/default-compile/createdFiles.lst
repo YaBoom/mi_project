@@ -1,0 +1,3 @@
+com\mi\im\user\mapper\UserMapper.class
+com\mi\im\user\ImUserServiceApplication.class
+com\mi\im\user\service\impl\UserServiceImpl.class

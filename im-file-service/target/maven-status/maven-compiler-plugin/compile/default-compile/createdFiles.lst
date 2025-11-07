@@ -1,0 +1,6 @@
+com\mi\im\file\config\MinioConfig$1.class
+com\mi\im\file\service\FileService.class
+com\mi\im\file\config\MinioConfig.class
+com\mi\im\file\ImFileServiceApplication.class
+com\mi\im\file\controller\FileController.class
+com\mi\im\file\service\impl\FileServiceImpl.class

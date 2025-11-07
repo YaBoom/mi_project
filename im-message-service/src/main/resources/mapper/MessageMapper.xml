@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mi.im.message.service.mapper.MessageMapper">
+
+    <!-- 表名 -->
+    <sql id="tableName">im_message</sql>
+
+    <!-- 基础字段 -->
+    <sql id="baseColumns">
+        message_id, sender_id, receiver_id, message_type, content,
+        file_url, file_size, file_type, status, send_time,
+        is_group_message, group_id, is_offline, is_blocked
+    </sql>
+
+    <!-- 插入消息 -->
+    <insert id="insert" parameterType="Message">
+        INSERT INTO <include refid="tableName" />
+        (
+        message_id, sender_id, receiver_id, message_type, content,
+        file_url, file_size, file_type, status, send_time,
+        is_group_message, group_id, is_offline, is_blocked
+        )
+        VALUES
+        (
+        #{messageId}, #{senderId}, #{receiverId}, #{messageType}, #{content},
+        #{fileUrl}, #{fileSize}, #{fileType}, #{status}, #{sendTime},
+        #{isGroupMessage}, #{groupId}, #{isOffline}, #{isBlocked}
+        )
+    </insert>
+
+    <!-- 获取历史消息 -->
+    <select id="selectHistoryMessages" resultType="Message">
+        SELECT <include refid="baseColumns" />
+        FROM <include refid="tableName" />
+        WHERE
+        (
+        (sender_id = #{userId} AND receiver_id = #{targetId})
+        OR
+        (sender_id = #{targetId} AND receiver_id = #{userId})
+        )
+        <if test="startTime != null">
+            AND send_time >= #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND send_time <= #{endTime}
+        </if>
+        ORDER BY send_time DESC
+        <if test="limit != null">
+            LIMIT #{limit}
+        </if>
+    </select>
+
+    <!-- 获取离线消息 -->
+    <select id="selectOfflineMessages" resultType="Message">
+        SELECT <include refid="baseColumns" />
+        FROM <include refid="tableName" />
+        WHERE receiver_id = #{userId}
+        AND is_offline = TRUE
+        AND status < 3
+        ORDER BY send_time ASC
+    </select>
+
+    <!-- 标记消息为已读 -->
+    <update id="updateMessageStatus">
+        UPDATE <include refid="tableName" />
+        SET status = 3, is_offline = FALSE
+        WHERE message_id = #{messageId}
+    </update>
+
+    <!-- 批量标记消息为已读 -->
+    <update id="batchUpdateMessageStatus">
+        UPDATE <include refid="tableName" />
+        SET status = 3, is_offline = FALSE
+        WHERE message_id IN
+        <foreach collection="list" item="messageId" open="(" close=")" separator=",">
+            #{messageId}
+        </foreach>
+    </update>
+
+    <!-- 根据消息ID获取消息 -->
+    <select id="selectByMessageId" resultType="Message">
+        SELECT <include refid="baseColumns" />
+        FROM <include refid="tableName" />
+        WHERE message_id = #{messageId}
+    </select>
+
+    <!-- 获取未读消息数量 -->
+    <select id="countUnreadMessages" resultType="int">
+        SELECT COUNT(*)
+        FROM <include refid="tableName" />
+        WHERE receiver_id = #{userId}
+        AND status < 3
+    </select>
+</mapper>
