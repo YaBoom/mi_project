@@ -16,6 +16,10 @@
     <description>IM系统用户服务模块</description>
 
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+        </dependency>
         <!-- 公共模块 -->
         <dependency>
             <groupId>com.mi.im</groupId>

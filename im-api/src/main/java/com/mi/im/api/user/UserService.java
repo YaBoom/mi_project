@@ -1,6 +1,9 @@
 package com.mi.im.api.user;
 
 import com.mi.im.common.model.User;
+import com.mi.im.common.model.dto.UserDTO;
+
+import java.util.List;
 
 /**
  * 用户服务接口
@@ -12,14 +15,15 @@ public interface UserService {
      * @param userId 用户ID
      * @return 用户信息
      */
-    User getUserById(Long userId);
+    UserDTO getUserById(Long userId);
+
     
     /**
      * 根据手机号获取用户信息
      * @param phone 手机号
      * @return 用户信息
      */
-    User getUserByPhone(String phone);
+    UserDTO getUserByPhone(String phone);
     
     /**
      * 更新用户状态

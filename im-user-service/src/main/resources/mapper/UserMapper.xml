@@ -9,18 +9,18 @@
     <sql id="baseColumns">
         user_id, username, password, nickname, avatar, 
         phone, email, online_status, last_online_time, current_node_id, 
-        latitude, longitude, create_time, update_time, current_server, status
+        location, create_time, update_time, current_server, status
     </sql>
     
     <!-- 根据用户ID查询用户 -->
-    <select id="selectById" parameterType="java.lang.Long" resultType="com.mi.im.common.model.User">
+    <select id="selectById" parameterType="java.lang.Long" resultType="com.mi.im.common.model.dto.UserDTO">
         SELECT <include refid="baseColumns" />
         FROM <include refid="tableName" />
         WHERE user_id = #{userId}
     </select>
     
     <!-- 根据手机号查询用户 -->
-    <select id="selectByPhone" parameterType="java.lang.String" resultType="com.mi.im.common.model.User">
+    <select id="selectByPhone" parameterType="java.lang.String" resultType="com.mi.im.common.model.dto.UserDTO">
         SELECT <include refid="baseColumns" />
         FROM <include refid="tableName" />
         WHERE phone = #{phone}

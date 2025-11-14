@@ -2,11 +2,16 @@ package com.mi.im.user.service.impl;
 
 import com.mi.im.api.user.UserService;
 import com.mi.im.common.model.User;
+import com.mi.im.common.model.dto.UserDTO;
 import com.mi.im.user.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.query.IndexQuery;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -17,39 +22,42 @@ public class UserServiceImpl implements UserService {
     
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
+
+    private static final String PERSON_INDEX_NAME = "elastic_search_project";
+    private static final String PERSON_INDEX_TYPE = "person";
     
-    private static final String USER_CACHE_PREFIX = "user:";
+    private static final String USER_CACHE_PREFIX = "userDto:";
     private static final long USER_CACHE_TTL = 3600; // 1小时
 
-
     @Override
-    public User getUserById(Long userId) {
+    public UserDTO getUserById(Long userId) {
+
         // 先从缓存获取
         String cacheKey = USER_CACHE_PREFIX + userId;
-        User user = (User) redisTemplate.opsForValue().get(cacheKey);
-        if (user != null) {
-            return user;
+        UserDTO userDTO = (UserDTO) redisTemplate.opsForValue().get(cacheKey);
+        if (userDTO != null) {
+            return userDTO;
         }
 
         // 缓存未命中，从数据库查询
-        user = userMapper.selectById(userId);
-        if (user != null) {
+        userDTO = userMapper.selectById(userId);
+        if (userDTO != null) {
             // 存入缓存
-            redisTemplate.opsForValue().set(cacheKey, user, USER_CACHE_TTL, TimeUnit.SECONDS);
+            redisTemplate.opsForValue().set(cacheKey, userDTO, USER_CACHE_TTL, TimeUnit.SECONDS);
         }
 
-        return user;
+        return userDTO;
     }
 
     @Override
-    public User getUserByPhone(String phone) {
+    public UserDTO getUserByPhone(String phone) {
         return userMapper.selectByPhone(phone);
     }
 
     @Override
     public boolean updateUserStatus(Long userId, Integer status) {
         // 更新数据库
-        int result = userMapper.updateStatus(userId.toString(), status);
+        int result = userMapper.updateStatus(userId, status);
 
         // 更新缓存
         if (result > 0) {
